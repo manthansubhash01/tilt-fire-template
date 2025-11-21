@@ -1,24 +1,40 @@
+import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { useState, useEffect } from "react";
-import { View, StyleSheet, Dimensions, Text } from "react-native";
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
-const PLAYER_WIDTH = 50;
-const PLAYER_HEIGHT = 50;
-
-const BULLET_WIDTH = 10;
-const BULLET_HEIGHT = 20;
-
-const BLOCK_WIDTH = 40;
-const BLOCK_HEIGHT = 40;
+import { StyleSheet, View } from "react-native";
+import StartScreen from "./screens/StartScreen";
+import GameScreen from "./screens/GameScreen";
+import GameOverScreen from "./screens/GameOverScreen";
 
 export default function App() {
-  const [playerX, setPlayerX] = useState((screenWidth - PLAYER_WIDTH) / 2);
+  const [gameState, setGameState] = useState("start");
+  const [finalScore, setFinalScore] = useState(0);
+
+  const handleStartGame = () => {
+    setGameState("playing");
+    setFinalScore(0);
+  };
+
+  const handleGameOver = (score) => {
+    setFinalScore(score);
+    setGameState("gameOver");
+  };
+
+  const handleRestart = () => {
+    setGameState("playing");
+    setFinalScore(0);
+  };
 
   return (
     <View style={styles.container}>
-      <View style={[styles.player, { left: playerX }]} />
-      <Text style={styles.instruction}>Tilt your phone to move</Text>
+      <StatusBar style="light" />
+
+      {gameState === "start" && <StartScreen onStartGame={handleStartGame} />}
+
+      {gameState === "playing" && <GameScreen onGameOver={handleGameOver} />}
+
+      {gameState === "gameOver" && (
+        <GameOverScreen score={finalScore} onRestart={handleRestart} />
+      )}
     </View>
   );
 }
@@ -26,49 +42,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    paddingBottom: 60,
-  },
-  player: {
-    position: "absolute",
-    bottom: 20,
-    width: PLAYER_WIDTH,
-    height: PLAYER_HEIGHT,
-    backgroundColor: "#FFF",
-    borderWidth: 2,
-    borderColor: "#000",
-  },
-  instruction: {
-    position: "absolute",
-    top: 70,
-    color: "#fff",
-    fontFamily: "Courier",
-    fontSize: 14,
-  },
-  bullet: {
-    position: "absolute",
-    width: BULLET_WIDTH,
-    height: BULLET_HEIGHT,
-    backgroundColor: "#FFF",
-    borderWidth: 1,
-    borderColor: "#000",
-  },
-  fallingBlock: {
-    position: "absolute",
-    width: BLOCK_WIDTH,
-    height: BLOCK_HEIGHT,
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "black",
-  },
-  gameOverText: {
-    position: "absolute",
-    top: screenHeight / 2 - 40,
-    color: "#FFF",
-    fontSize: 24,
-    fontWeight: "bold",
-    fontFamily: "Courier",
   },
 });
